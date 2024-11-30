@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { ChevronRight as ChevronRightIcon } from "react-feather";
 import styled from "styled-components";
 import Typography from "./Typography";
@@ -9,6 +9,7 @@ import { Forecast, TileForecast } from "../utils/types/forecast";
 
 const WeatherCard: React.FC = React.memo(() => {
   const { data } = useApiContext();
+  const [activeDay, setActiveDay] = useState<string | null>(null);
 
   const weatherInfo = useMemo(() => {
     if (!data?.current?.data?.[0] || !data?.forecast?.data?.[0]) {
@@ -21,17 +22,35 @@ const WeatherCard: React.FC = React.memo(() => {
       };
     }
 
+    // If there's an active day selected, use that forecast data instead
     const currentData = data.current.data[0];
-    const forecastData = data.forecast.data[0];
+    const forecastData = data.forecast.data;
+    
+    if (activeDay) {
+      const activeForecast = forecastData.find(
+        (f: Forecast) => new Date(f.datetime).toLocaleDateString('en-US', { weekday: 'long' }) === activeDay
+      );
+      
+      if (activeForecast) {
+        return {
+          temp: Math.round(activeForecast.temp),
+          high: Math.round(activeForecast.high_temp),
+          low: Math.round(activeForecast.low_temp),
+          description: activeForecast.weather.description,
+          icon: activeForecast.weather.icon
+        };
+      }
+    }
 
+    // Default to current weather if no active day or if active day not found
     return {
       temp: Math.round(currentData.temp),
-      high: Math.round(forecastData.high_temp),
-      low: Math.round(forecastData.low_temp),
+      high: Math.round(forecastData[0].high_temp),
+      low: Math.round(forecastData[0].low_temp),
       description: currentData.weather.description,
       icon: currentData.weather.icon
     };
-  }, [data]);
+  }, [data, activeDay]);
 
   const forecastData = useMemo(() => {
     if (!data?.forecast?.data) return [];
@@ -40,6 +59,10 @@ const WeatherCard: React.FC = React.memo(() => {
       temp: Math.round(forecast.temp)
     }));
   }, [data]);
+
+  const handleTileClick = (day: string) => {
+    setActiveDay(activeDay === day ? null : day);
+  };
 
   return (
     <Row>
@@ -67,17 +90,17 @@ const WeatherCard: React.FC = React.memo(() => {
         </Feature>
       </Grid>
       <Grid>
-       <Row>
-       {weatherInfo.icon && (
-          <WeatherIcon
-            src={`https://cdn.weatherbit.io/static/img/icons/${weatherInfo.icon}.png`}
-            alt={weatherInfo.description}
-          />
-        )}
-        <Typography color="#d1d5db" fontWeight="400" fontSize="54px">
-          {weatherInfo.description}
-        </Typography>
-       </Row>
+        <Row>
+          {weatherInfo.icon && (
+            <WeatherIcon
+              src={`https://cdn.weatherbit.io/static/img/icons/${weatherInfo.icon}.png`}
+              alt={weatherInfo.description}
+            />
+          )}
+          <Typography color="#d1d5db" fontWeight="400" fontSize="54px">
+            {weatherInfo.description}
+          </Typography>
+        </Row>
         <Feature>
           <Row $gap={8}>
             <Grid>
@@ -99,15 +122,19 @@ const WeatherCard: React.FC = React.memo(() => {
         </Feature>
       </Grid>
       <Fragment>
-        <Typography fontWeight="400" fontSize="16px" color="#6b7280">Upcoming Forecast</Typography>
+        <Typography fontWeight="400" fontSize="16px" color="#6b7280">
+          Upcoming Forecast
+        </Typography>
         <Grid>
-        {forecastData.map((forecast: TileForecast) => (
-          <Tile
-            key={forecast.day}
-            forecast={forecast}
-          />
-        ))}
-      </Grid>
+          {forecastData.map((forecast: TileForecast) => (
+            <Tile
+              key={forecast.day}
+              forecast={forecast}
+              isActive={activeDay === forecast.day}
+              onClick={() => handleTileClick(forecast.day)}
+            />
+          ))}
+        </Grid>
       </Fragment>
     </Row>
   );

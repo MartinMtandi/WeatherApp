@@ -5,18 +5,20 @@ import { TileForecast } from "../utils/types/forecast";
 
 interface TileProps {
   forecast: TileForecast;
+  isActive?: boolean;
+  onClick?: () => void;
 }
 
-const Tile: React.FC<TileProps> = ({ forecast }) => {
+const Tile: React.FC<TileProps> = ({ forecast, isActive, onClick }) => {
   return (
-    <TileWrapper>
-      <Container>
+    <TileWrapper isActive={isActive} onClick={onClick}>
+      <Container isActive={isActive}>
         <StyledTypography>
           <Typography fontWeight="300" fontSize="18px" color="#d1d5db">
             {forecast.day}
           </Typography>
         </StyledTypography>
-        <Divider />
+        <Divider isActive={isActive} />
         <StyledTypography>
           <Typography fontWeight="300" fontSize="24px" color="#6b7280">
             {forecast.temp}&deg;
@@ -78,9 +80,9 @@ const Tile: React.FC<TileProps> = ({ forecast }) => {
   );
 };
 
-const Divider = styled.div`
+const Divider = styled.div<{ isActive?: boolean }>`
   height: 126px;
-  border-left: 1px dashed #6b7280;
+  border-left: 1px dashed ${props => props.isActive ? '#ddd' : '#6b7280'};
   margin: 6px 0px;
   transition: border-left-color 0.3s ease;
 `;
@@ -96,11 +98,21 @@ const CurvyLineWrapper = styled.div`
   z-index: -1;
 `;
 
-const Container = styled.div`
+const Container = styled.div<{ isActive?: boolean }>`
   display: flex;
   flex-direction: column;
   align-items: center;
   cursor: pointer;
+  
+  ${props => props.isActive && `
+    ${Divider} {
+      border-left-color: #ddd;
+    }
+    
+    div {
+      color: #ddd;
+    }
+  `}
 
   &:hover {
     ${Divider} {
@@ -113,22 +125,21 @@ const Container = styled.div`
   }
 `;
 
-// Styled wrapper for Typography to handle hover
 const StyledTypography = styled.div`
   transition: color 0.3s ease;
-  color: inherit; /* Use inherited color */
+  color: inherit;
 
   ${Container}:hover & {
     color: #fff;
   }
 `;
 
-const TileWrapper = styled.div`
+const TileWrapper = styled.div<{ isActive?: boolean }>`
   min-width: 110px;
   padding: 10px 0;
-  border: 1px solid transparent;
-  border-radius: 0; /* Ensure initial radius is 0 */
-  background: rgba(75, 85, 99, 0);
+  border: 1px solid ${props => props.isActive ? '#6b7280' : 'transparent'};
+  border-radius: ${props => props.isActive ? '10px' : '0'};
+  background: ${props => props.isActive ? 'rgba(75, 85, 99, 0.3)' : 'rgba(75, 85, 99, 0)'};
   transition: 
     background 0.4s ease, 
     border-color 0.4s ease, 
@@ -140,6 +151,5 @@ const TileWrapper = styled.div`
     border: 1px solid #6b7280;
   }
 `;
-
 
 export default Tile;
