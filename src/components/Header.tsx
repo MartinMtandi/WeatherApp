@@ -6,12 +6,17 @@ import { useApiContext } from "../utils/context/ApiContext";
 
 const Header: React.FC = React.memo(() => {
   const [expanded, setExpanded] = useState<boolean>(false);
-  const [city, setSearchCity] = useState<string>("Wellington");
+  const [city, setSearchCity] = useState<string>("");
 
   const { fetchData } = useApiContext();
 
   useEffect(() => {
-    fetchData(city);
+    // Check session storage first
+    const storedData = sessionStorage.getItem('weather_data');
+    // Only fetch if no stored data
+    if (!storedData) {
+      fetchData("Wellington");
+    }
   }, []);
 
   const handleSearchClick = useCallback(async () => {
@@ -44,6 +49,7 @@ const Header: React.FC = React.memo(() => {
   const handleSearchSubmit = useCallback(async () => {
     if (city.trim()) {
       try {
+        // fetchData will handle the caching logic
         await fetchData(city);
         setSearchCity(""); // Reset the input after successful submission
         setExpanded(false); // Collapse the search after successful submission

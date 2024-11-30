@@ -1,9 +1,0 @@
-[
-    { "id": 1, "day": "Sunday", "temp": 20 },
-    { "id": 2, "day": "Monday", "temp": 22 },
-    { "id": 3, "day": "Tuesday", "temp": 18 },
-    { "id": 4, "day": "Wednesday", "temp": 25 },
-    { "id": 5, "day": "Thursday", "temp": 21 },
-    { "id": 6, "day": "Friday", "temp": 23 }
-  ]
-  

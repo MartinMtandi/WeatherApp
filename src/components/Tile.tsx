@@ -1,10 +1,10 @@
 import React from "react";
 import styled from "styled-components";
 import Typography from "./Typography";
-import { Forecast } from "../utils/types/forecast";
+import { TileForecast } from "../utils/types/forecast";
 
 interface TileProps {
-  forecast: Forecast;
+  forecast: TileForecast;
 }
 
 const Tile: React.FC<TileProps> = ({ forecast }) => {

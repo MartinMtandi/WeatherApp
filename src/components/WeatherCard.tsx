@@ -1,28 +1,59 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { ChevronRight as ChevronRightIcon } from "react-feather";
 import styled from "styled-components";
 import Typography from "./Typography";
 import Card from "./Card";
 import Tile from "./Tile";
-import forecast from "../utils/forecast.json";
-import { Forecast } from "../utils/types/forecast";
+import { useApiContext } from "../utils/context/ApiContext";
+import { Forecast, TileForecast } from "../utils/types/forecast";
 
-const WeatherCard: React.FC = () => {
+const WeatherCard: React.FC = React.memo(() => {
+  const { data } = useApiContext();
+
+  const weatherInfo = useMemo(() => {
+    if (!data?.current?.data?.[0] || !data?.forecast?.data?.[0]) {
+      return {
+        temp: "N/A",
+        high: "N/A",
+        low: "N/A",
+        description: "Loading..."
+      };
+    }
+
+    const currentData = data.current.data[0];
+    const forecastData = data.forecast.data[0];
+
+    return {
+      temp: Math.round(currentData.temp),
+      high: Math.round(forecastData.high_temp),
+      low: Math.round(forecastData.low_temp),
+      description: currentData.weather.description
+    };
+  }, [data]);
+
+  const forecastData = useMemo(() => {
+    if (!data?.forecast?.data) return [];
+    return data.forecast.data.slice(1, 7).map((forecast: Forecast): TileForecast => ({
+      day: new Date(forecast.datetime).toLocaleDateString('en-US', { weekday: 'long' }),
+      temp: Math.round(forecast.temp)
+    }));
+  }, [data]);
+
   return (
     <Row>
       <Grid>
         <CurrentTemperature>
           <Typography fontWeight="300" fontSize="80px">
-            18&deg;
+            {weatherInfo.temp}&deg;
           </Typography>
           <Row>
             <Pill>
               <Typography color="#6b7280">H</Typography>
-              <Typography>29&deg;</Typography>
+              <Typography>{weatherInfo.high}&deg;</Typography>
             </Pill>
             <Pill>
               <Typography color="#6b7280">L</Typography>
-              <Typography>11&deg;</Typography>
+              <Typography>{weatherInfo.low}&deg;</Typography>
             </Pill>
           </Row>
         </CurrentTemperature>
@@ -35,7 +66,7 @@ const WeatherCard: React.FC = () => {
       </Grid>
       <Grid>
         <Typography color="#d1d5db" fontWeight="400" fontSize="54px">
-          Stormy with partly cloudy
+          {weatherInfo.description}
         </Typography>
         <Feature>
           <Row $gap={8}>
@@ -58,13 +89,16 @@ const WeatherCard: React.FC = () => {
         </Feature>
       </Grid>
       <Grid>
-        {forecast.map((f: Forecast) => (
-          <Tile key={f.id} forecast={f} />
+        {forecastData.map((forecast: TileForecast) => (
+          <Tile
+            key={forecast.day}
+            forecast={forecast}
+          />
         ))}
       </Grid>
     </Row>
   );
-};
+});
 
 const Grid = styled.div`
   position: relative;
