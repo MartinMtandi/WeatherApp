@@ -4,11 +4,13 @@ import styled from "styled-components";
 import Typography from "./Typography";
 import Card from "./Card";
 import Tile from "./Tile";
+import Carousel from "./Carousel";
 import { useApiContext } from "../utils/context/ApiContext";
 import { Forecast, TileForecast } from "../utils/types/forecast";
+import { RecentSearch } from "../utils/types/api_context";
 
 const WeatherCard: React.FC = React.memo(() => {
-  const { data, selectedDay, setSelectedDay } = useApiContext();
+  const { data, selectedDay, setSelectedDay, recentSearches, showAllSearches, setShowAllSearches } = useApiContext();
 
   const weatherInfo = useMemo(() => {
     if (!data?.current?.data?.[0] || !data?.forecast?.data?.[0]) {
@@ -63,6 +65,10 @@ const WeatherCard: React.FC = React.memo(() => {
     setSelectedDay(selectedDay === day ? null : day);
   };
 
+  const handleSeeAllClick = () => {
+    setShowAllSearches(!showAllSearches);
+  };
+
   return (
     <Row>
       <Grid>
@@ -104,19 +110,39 @@ const WeatherCard: React.FC = React.memo(() => {
           <Row $gap={8}>
             <Grid>
               <Typography color="#6b7280">Recently Searched</Typography>
-              <Link>
-                <Typography>
-                  See all{" "}
+              <Link $disabled={!recentSearches?.length} onClick={handleSeeAllClick}>
+                <Typography color={recentSearches?.length ? '#ddd' : '#6b7280'}>
+                  {showAllSearches ? "Show less" : "See all"}{" "}
                   <IconWrapper $margin="5px 0 0 4px">
-                    <ChevronRightIcon size={16} />
+                    <ChevronRightIcon size={16} style={{ 
+                      transform: showAllSearches ? 'rotate(-90deg)' : 'rotate(90deg)',
+                      transition: 'transform 0.3s ease'
+                    }} />
                   </IconWrapper>
                 </Typography>
               </Link>
             </Grid>
-            <Grid>
-              <Card />
-              <Card />
-            </Grid>
+            <CarouselContainer $withPadding={showAllSearches}>
+              {recentSearches?.length > 0 ? (
+                showAllSearches ? (
+                  <CarouselWrapper>
+                    <Carousel itemsPerPage={2}>
+                      {recentSearches.map((search: RecentSearch) => (
+                        <Card key={search.city} search={search} />
+                      ))}
+                    </Carousel>
+                  </CarouselWrapper>
+                ) : (
+                  <CardGrid>
+                    {recentSearches.slice(0, 2).map((search: RecentSearch) => (
+                      <Card key={search.city} search={search} />
+                    ))}
+                  </CardGrid>
+                )
+              ) : (
+                <Typography color="#6b7280">No recent searches</Typography>
+              )}
+            </CarouselContainer>
           </Row>
         </Feature>
       </Grid>
@@ -185,20 +211,44 @@ const Pill = styled.div`
 `;
 
 const Feature = styled.div`
-  width: 28%;
+  width: 30%;
+  position: relative;
 `;
 
-const Link = styled.button`
+const CarouselContainer = styled.div<{ $withPadding: boolean }>`
+  padding: ${props => props.$withPadding ? '0 40px' : '0'};
+  width: 100%;
+`;
+
+const CarouselWrapper = styled.div`
+  margin: 0 -40px;
+  width: calc(100% + 80px);
+`;
+
+const Link = styled.div<{ $disabled?: boolean }>`
+  cursor: ${props => props.$disabled ? 'not-allowed' : 'pointer'};
+  opacity: ${props => props.$disabled ? 0.5 : 1};
+  pointer-events: ${props => props.$disabled ? 'none' : 'auto'};
   background: transparent;
   border: none;
   padding: 4px 0px 4px 4px;
-  cursor: pointer;
 `;
 
 const WeatherIcon = styled.img`
   width: 100px;
   height: 100px;
   margin-bottom: 16px;
+`;
+
+const CardGrid = styled.div`
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+
+  & > * {
+    flex: 1;
+    min-width: 0;
+  }
 `;
 
 export default WeatherCard;
