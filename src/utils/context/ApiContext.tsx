@@ -1,6 +1,10 @@
-import React, { createContext, useState, useContext, ReactNode, useEffect } from "react";
+import React, { createContext, useState, useContext, useCallback, ReactNode, useEffect } from "react";
 import { ApiContextType } from "../types/api_context";
 import { ApiService } from "../../services/ApiService";
+
+interface ApiProviderProps {
+  children: ReactNode;
+}
 
 const ApiContext = createContext<ApiContextType | undefined>(undefined);
 
@@ -12,72 +16,80 @@ interface StoredData {
   timestamp: number;
 }
 
-type ApiProviderProps = {
-  children: ReactNode;
-};
-
 export const ApiProvider: React.FC<ApiProviderProps> = ({ children }) => {
   const [data, setData] = useState<Record<string, any>>({});
   const [currentCity, setCurrentCity] = useState<string>("");
+  const [selectedDay, setSelectedDay] = useState<string | null>(null);
 
   // Load data from session storage on initial mount
   useEffect(() => {
     const storedData = sessionStorage.getItem(STORAGE_KEY);
     if (storedData) {
-      const { city, data: weatherData, timestamp }: StoredData = JSON.parse(storedData);
-      
-      // Check if data is less than 30 minutes old
-      const now = Date.now();
-      const thirtyMinutes = 30 * 60 * 1000;
-      
-      if (now - timestamp < thirtyMinutes) {
-        setData(weatherData);
-        setCurrentCity(city);
-      } else {
-        // Clear expired data
-        sessionStorage.removeItem(STORAGE_KEY);
+      try {
+        const { city, data: weatherData, timestamp }: StoredData = JSON.parse(storedData);
+        const currentTime = new Date().getTime();
+        
+        // Check if the data is less than 30 minutes old
+        if (currentTime - timestamp < 30 * 60 * 1000) {
+          setData(weatherData);
+          setCurrentCity(city);
+          console.log('Loaded cached data for', city);
+        } else {
+          sessionStorage.removeItem(STORAGE_KEY);
+        }
+      } catch (error) {
+        console.error("Error parsing stored data:", error);
       }
     }
   }, []);
 
-  const fetchData = async (city: string) => {
+  const fetchData = useCallback(async (city: string) => {
     try {
+      // Clear selected day when fetching new data
+      setSelectedDay(null);
+
       // Check if we already have data for this city
       if (city.toLowerCase() === currentCity.toLowerCase()) {
         console.log('Using cached data for', city);
         return;
       }
 
-      // Fetch new data
       const responses = await ApiService.fetchAll(city);
-      
-      // Store in state and session storage
       setData(responses);
       setCurrentCity(city);
-      
-      const storageData: StoredData = {
-        city,
-        data: responses,
-        timestamp: Date.now()
-      };
-      
-      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(storageData));
+
+      // Store in session storage
+      sessionStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({
+          city,
+          timestamp: new Date().getTime(),
+          data: responses,
+        })
+      );
     } catch (error) {
       console.error("Error fetching API data:", error);
       throw error;
     }
+  }, [currentCity]);
+
+  const contextValue: ApiContextType = {
+    data,
+    selectedDay,
+    setSelectedDay,
+    fetchData
   };
 
   return (
-    <ApiContext.Provider value={{ data, fetchData }}>
+    <ApiContext.Provider value={contextValue}>
       {children}
     </ApiContext.Provider>
   );
 };
 
-export const useApiContext = (): ApiContextType => {
+export const useApiContext = () => {
   const context = useContext(ApiContext);
-  if (!context) {
+  if (context === undefined) {
     throw new Error("useApiContext must be used within an ApiProvider");
   }
   return context;

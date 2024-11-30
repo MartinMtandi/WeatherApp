@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { ChevronRight as ChevronRightIcon } from "react-feather";
 import styled from "styled-components";
 import Typography from "./Typography";
@@ -8,8 +8,7 @@ import { useApiContext } from "../utils/context/ApiContext";
 import { Forecast, TileForecast } from "../utils/types/forecast";
 
 const WeatherCard: React.FC = React.memo(() => {
-  const { data } = useApiContext();
-  const [activeDay, setActiveDay] = useState<string | null>(null);
+  const { data, selectedDay, setSelectedDay } = useApiContext();
 
   const weatherInfo = useMemo(() => {
     if (!data?.current?.data?.[0] || !data?.forecast?.data?.[0]) {
@@ -26,9 +25,9 @@ const WeatherCard: React.FC = React.memo(() => {
     const currentData = data.current.data[0];
     const forecastData = data.forecast.data;
     
-    if (activeDay) {
+    if (selectedDay) {
       const activeForecast = forecastData.find(
-        (f: Forecast) => new Date(f.datetime).toLocaleDateString('en-US', { weekday: 'long' }) === activeDay
+        (f: Forecast) => new Date(f.datetime).toLocaleDateString('en-US', { weekday: 'long' }) === selectedDay
       );
       
       if (activeForecast) {
@@ -50,7 +49,7 @@ const WeatherCard: React.FC = React.memo(() => {
       description: currentData.weather.description,
       icon: currentData.weather.icon
     };
-  }, [data, activeDay]);
+  }, [data, selectedDay]);
 
   const forecastData = useMemo(() => {
     if (!data?.forecast?.data) return [];
@@ -61,7 +60,7 @@ const WeatherCard: React.FC = React.memo(() => {
   }, [data]);
 
   const handleTileClick = (day: string) => {
-    setActiveDay(activeDay === day ? null : day);
+    setSelectedDay(selectedDay === day ? null : day);
   };
 
   return (
@@ -130,7 +129,7 @@ const WeatherCard: React.FC = React.memo(() => {
             <Tile
               key={forecast.day}
               forecast={forecast}
-              isActive={activeDay === forecast.day}
+              isActive={selectedDay === forecast.day}
               onClick={() => handleTileClick(forecast.day)}
             />
           ))}
