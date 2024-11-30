@@ -37,7 +37,7 @@ const WeatherPage: React.FC = React.memo(() => {
   return (
     <Container>
       <Sidebar />
-      <div>
+      <Fragment>
         <Header />
         <HeadLiner>
           <IconWrapper>
@@ -51,10 +51,12 @@ const WeatherPage: React.FC = React.memo(() => {
           </Typography>
         </HeadLiner>
         <WeatherCard />
-      </div>
+      </Fragment>
     </Container>
   );
 });
+
+const Fragment = styled.div``;
 
 const Container = styled.div`
   position: relative;

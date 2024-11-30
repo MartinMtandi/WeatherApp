@@ -16,7 +16,8 @@ const WeatherCard: React.FC = React.memo(() => {
         temp: "N/A",
         high: "N/A",
         low: "N/A",
-        description: "Loading..."
+        description: "Loading...",
+        icon: ""
       };
     }
 
@@ -27,7 +28,8 @@ const WeatherCard: React.FC = React.memo(() => {
       temp: Math.round(currentData.temp),
       high: Math.round(forecastData.high_temp),
       low: Math.round(forecastData.low_temp),
-      description: currentData.weather.description
+      description: currentData.weather.description,
+      icon: currentData.weather.icon
     };
   }, [data]);
 
@@ -65,9 +67,17 @@ const WeatherCard: React.FC = React.memo(() => {
         </Feature>
       </Grid>
       <Grid>
+       <Row>
+       {weatherInfo.icon && (
+          <WeatherIcon
+            src={`https://cdn.weatherbit.io/static/img/icons/${weatherInfo.icon}.png`}
+            alt={weatherInfo.description}
+          />
+        )}
         <Typography color="#d1d5db" fontWeight="400" fontSize="54px">
           {weatherInfo.description}
         </Typography>
+       </Row>
         <Feature>
           <Row $gap={8}>
             <Grid>
@@ -88,7 +98,9 @@ const WeatherCard: React.FC = React.memo(() => {
           </Row>
         </Feature>
       </Grid>
-      <Grid>
+      <Fragment>
+        <Typography fontWeight="400" fontSize="16px" color="#6b7280">Upcoming Forecast</Typography>
+        <Grid>
         {forecastData.map((forecast: TileForecast) => (
           <Tile
             key={forecast.day}
@@ -96,9 +108,16 @@ const WeatherCard: React.FC = React.memo(() => {
           />
         ))}
       </Grid>
+      </Fragment>
     </Row>
   );
 });
+
+const Fragment = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+`;
 
 const Grid = styled.div`
   position: relative;
@@ -148,6 +167,12 @@ const Link = styled.button`
   border: none;
   padding: 4px 0px 4px 4px;
   cursor: pointer;
+`;
+
+const WeatherIcon = styled.img`
+  width: 100px;
+  height: 100px;
+  margin-bottom: 16px;
 `;
 
 export default WeatherCard;

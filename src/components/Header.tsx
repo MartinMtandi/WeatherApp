@@ -60,6 +60,7 @@ const Header: React.FC = React.memo(() => {
   }, [city, fetchData]);
 
   const handleRedirect = useCallback(() => {
+    // If we had a download link for this app, we could use that
     const url =
       "https://play.google.com/store/apps/details?id=com.weather.forecast.weatherchannel&hl=en";
     window.open(url, "_blank");
