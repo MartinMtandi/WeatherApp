@@ -31,6 +31,7 @@ export interface ApiResponse {
 }
 
 export interface ApiContextType {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: Record<string, any>;
   selectedDay: string | null;
   setSelectedDay: (day: string | null) => void;

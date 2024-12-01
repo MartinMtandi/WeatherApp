@@ -1,15 +1,52 @@
 import React, { useMemo } from "react";
 import { styled } from "styled-components";
-import palmTrees from "../assets/dramatic-sky.jpg";
+import clearSky from "../assets/clear_sky.jpg";
+import brokenClouds from "../assets/broken_clouds.jpg";
+import lightRain from "../assets/light_rain.jpg";
+import snow from "../assets/snow.avif";
+import defaultBg from "../assets/default.jpg";
+import dramaticSky from "../assets/dramatic-sky.jpg";
 import Sidebar from "../components/Sidebar";
 import WeatherCard from "../components/WeatherCard";
 import Header from "../components/Header";
 import { MapPin as MapIcon } from "react-feather";
 import Typography from "../components/Typography";
 import { useApiContext } from "../utils/context/ApiContext";
+import { Forecast } from "../utils/types/forecast";
 
 const WeatherPage: React.FC = React.memo(() => {
   const { data, selectedDay } = useApiContext();
+
+  const backgroundImage = useMemo(() => {
+    if (!data?.current?.data?.[0]?.weather && !data?.forecast?.data) return defaultBg;
+
+    let weatherDesc;
+    if (selectedDay && data.forecast?.data) {
+      const selectedForecast = data.forecast.data.find((day: Forecast) => day.datetime === selectedDay);
+      weatherDesc = selectedForecast?.weather?.description?.toLowerCase() || '';
+    } else {
+      weatherDesc = data.current?.data?.[0]?.weather?.description?.toLowerCase() || '';
+    }
+
+    switch (true) {
+      case weatherDesc.includes('clear'):
+        return clearSky;
+      case weatherDesc.includes('broken'):
+        return brokenClouds;
+      case weatherDesc.includes('rain'):
+        return lightRain;
+      case weatherDesc.includes('snow'):
+        return snow;
+      case weatherDesc.includes('storm') ||
+        weatherDesc.includes('thunder') ||
+        weatherDesc.includes('lightning') ||
+        weatherDesc.includes('overcast'):
+        return dramaticSky;
+      default:
+        return defaultBg;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data?.current?.data, data?.forecast?.data, selectedDay]);
 
   const locationInfo = useMemo(() => {
     if (!data?.current?.data?.[0]) {
@@ -21,18 +58,18 @@ const WeatherPage: React.FC = React.memo(() => {
 
     const currentData = data.current.data[0];
     let date;
-    
+
     if (selectedDay) {
       date = new Date(selectedDay);
     } else {
       date = new Date();
     }
 
-    const formattedDate = date.toLocaleDateString('en-US', { 
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
+    const formattedDate = date.toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
     });
 
     return {
@@ -42,7 +79,8 @@ const WeatherPage: React.FC = React.memo(() => {
   }, [data, selectedDay]);
 
   return (
-    <Container>
+    <Container $backgroundImage={backgroundImage}>
+      <Overlay />
       <Sidebar />
       <Fragment>
         <Header />
@@ -65,9 +103,9 @@ const WeatherPage: React.FC = React.memo(() => {
 
 const Fragment = styled.div``;
 
-const Container = styled.div`
+const Container = styled.div<{ $backgroundImage: string }>`
   position: relative;
-  background-image: url(${palmTrees});
+  background-image: url(${props => props.$backgroundImage});
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
@@ -94,6 +132,16 @@ const Container = styled.div`
     position: relative;
     z-index: 2;
   }
+`;
+
+const Overlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(1, 50, 83, 0.4);
+  z-index: 1;
 `;
 
 const HeadLiner = styled.div`
