@@ -5,6 +5,26 @@ import Typography from "./Typography";
 import { useApiContext } from "../utils/context/ApiContext";
 import { capitalizeWords } from "../utils/helpers/string";
 
+const ResponsiveButtonText: React.FC = () => {
+  const [isMobile, setIsMobile] = useState(window.matchMedia("(max-width: 480px)").matches);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(max-width: 480px)");
+    const handleResize = (e: MediaQueryListEvent) => {
+      setIsMobile(e.matches);
+    };
+
+    mediaQuery.addEventListener("change", handleResize);
+    return () => mediaQuery.removeEventListener("change", handleResize);
+  }, []);
+
+  return (
+    <Typography>
+      {isMobile ? "Get App" : "Download App"}
+    </Typography>
+  );
+};
+
 const Header: React.FC = React.memo(() => {
   const [expanded, setExpanded] = useState<boolean>(false);
   const [city, setSearchCity] = useState<string>("");
@@ -28,6 +48,7 @@ const Header: React.FC = React.memo(() => {
       await handleSearchSubmit(); 
       setExpanded(false); 
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [expanded, city]);
 
   const handleBlur = useCallback((e: React.FocusEvent<HTMLInputElement>) => {
@@ -102,7 +123,7 @@ const Header: React.FC = React.memo(() => {
         </SearchContainer>
       </form>
       <Button onClick={handleRedirect}>
-        <Typography>Download App</Typography>
+        <ResponsiveButtonText />
       </Button>
     </Container>
   );

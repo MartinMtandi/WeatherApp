@@ -141,7 +141,8 @@ const Container = styled.div`
   @media (max-width: 1024px) {
     min-height: auto;
     grid-template-columns: 1fr;
-     & > :nth-child(3) {
+    padding: 20px;
+    & > :nth-child(3) {
       order: 1;
     }
   }

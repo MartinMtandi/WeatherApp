@@ -1,15 +1,16 @@
-import React, { useState, useEffect, useMemo } from 'react'
-import { styled } from 'styled-components';
-import Typography from './Typography';
-import Center from './Center';
-import viteLogo from '../assets/vite.svg';
-import Square from './Square';
-import { useApiContext } from '../utils/context/ApiContext';
-import { WeatherData, ApiResponse } from '../utils/types/api_context';
+import React, { useState, useEffect, useMemo } from "react";
+import { styled } from "styled-components";
+import Typography from "./Typography";
+import Center from "./Center";
+import viteLogo from "../assets/vite.svg";
+import Square from "./Square";
+import { useApiContext } from "../utils/context/ApiContext";
+import { WeatherData, ApiResponse } from "../utils/types/api_context";
+import Forecast from "./Forecast";
 
 const Sidebar: React.FC = () => {
-  const [time, setTime] = useState<string>('');
-  const { data, selectedDay } = useApiContext();
+  const [time, setTime] = useState<string>("");
+  const { data, selectedDay, recentSearches } = useApiContext();
   const typedData = data as ApiResponse;
 
   const weatherData = useMemo(() => {
@@ -19,16 +20,16 @@ const Sidebar: React.FC = () => {
         return {
           temp: 0,
           wind_spd: 0,
-          wind_cdir: 'N',
+          wind_cdir: "N",
           rh: 0,
           uv: 0,
           pres: 0,
-          wind_description: 'Calm',
+          wind_description: "Calm",
           dewpt: 0,
           weather: {
-            description: 'No data',
-            icon: 'c01d'
-          }
+            description: "No data",
+            icon: "c01d",
+          },
         };
       }
       const current = typedData.current.data[0];
@@ -39,31 +40,31 @@ const Sidebar: React.FC = () => {
         rh: Math.round(current.rh),
         uv: Math.round(current.uv),
         pres: Math.round(current.pres),
-        wind_description: current.wind_spd < 5 ? 'Light' : 'Moderate',
+        wind_description: current.wind_spd < 5 ? "Light" : "Moderate",
         dewpt: Math.round(current.dewpt || 0),
-        weather: current.weather
+        weather: current.weather,
       };
     }
 
     // Use selected day's forecast data
-    const forecastData = typedData.forecast.data.find((day: WeatherData) =>
-      day.datetime === selectedDay
+    const forecastData = typedData.forecast.data.find(
+      (day: WeatherData) => day.datetime === selectedDay
     );
 
     if (!forecastData) {
       return {
         temp: 0,
         wind_spd: 0,
-        wind_cdir: 'N',
+        wind_cdir: "N",
         rh: 0,
         uv: 0,
         pres: 0,
-        wind_description: 'Calm',
+        wind_description: "Calm",
         dewpt: 0,
         weather: {
-          description: 'No data',
-          icon: 'c01d'
-        }
+          description: "No data",
+          icon: "c01d",
+        },
       };
     }
 
@@ -74,9 +75,9 @@ const Sidebar: React.FC = () => {
       rh: Math.round(forecastData.rh),
       uv: Math.round(forecastData.uv),
       pres: Math.round(forecastData.pres),
-      wind_description: forecastData.wind_spd < 5 ? 'Light' : 'Moderate',
+      wind_description: forecastData.wind_spd < 5 ? "Light" : "Moderate",
       dewpt: Math.round(forecastData.dewpt || 0),
-      weather: forecastData.weather
+      weather: forecastData.weather,
     };
   }, [typedData, selectedDay]);
 
@@ -85,7 +86,7 @@ const Sidebar: React.FC = () => {
     dewpt?: number;
   }
 
-  type SquareType = 'wind' | 'humidity' | 'uv' | 'pressure';
+  type SquareType = "wind" | "humidity" | "uv" | "pressure";
 
   interface SquareConfig {
     type: SquareType;
@@ -95,44 +96,51 @@ const Sidebar: React.FC = () => {
     subtitle?: string;
   }
 
-  const getSquareConfig = (weatherData: WeatherDataExtended): SquareConfig[] => [
+  const getSquareConfig = (
+    weatherData: WeatherDataExtended
+  ): SquareConfig[] => [
     {
       type: "wind" as SquareType,
       title: "Wind",
       value: weatherData.wind_spd,
       unit: "km/h",
-      subtitle: `${weatherData.wind_description || 'N/A'} • From ${weatherData.wind_cdir.toLowerCase()}`
+      subtitle: `${
+        weatherData.wind_description || "N/A"
+      } • From ${weatherData.wind_cdir.toLowerCase()}`,
     },
     {
       type: "humidity" as SquareType,
       title: "Humidity",
       value: weatherData.rh,
       unit: "%",
-      subtitle: `Dew point ${weatherData.dewpt || 0}°`
+      subtitle: `Dew point ${weatherData.dewpt || 0}°`,
     },
     {
       type: "uv" as SquareType,
       title: "UV index",
       value: weatherData.uv,
-      subtitle: weatherData.uv <= 2 ? 'Low' : weatherData.uv <= 5 ? 'Moderate' : 'High'
+      subtitle:
+        weatherData.uv <= 2 ? "Low" : weatherData.uv <= 5 ? "Moderate" : "High",
     },
     {
       type: "pressure" as SquareType,
       title: "Pressure",
       value: weatherData.pres,
-      unit: "mBar"
-    }
+      unit: "mBar",
+    },
   ];
 
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
-      setTime(now.toLocaleTimeString('en-US', {
-        hour: 'numeric',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: true
-      }));
+      setTime(
+        now.toLocaleTimeString("en-US", {
+          hour: "numeric",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: true,
+        })
+      );
     };
 
     updateTime(); // Initial update
@@ -146,7 +154,7 @@ const Sidebar: React.FC = () => {
       <Center>
         <LogoContainer>
           <Logo src={viteLogo} alt="Vite logo" />
-          <Typography fontSize='20px'>WeatherApp</Typography>
+          <Typography fontSize="20px">WeatherApp</Typography>
         </LogoContainer>
       </Center>
       <WeatherInfo>
@@ -154,38 +162,54 @@ const Sidebar: React.FC = () => {
           <Typography fontWeight="300" fontSize="64px">
             {Math.round(weatherData.temp || 0)}°
           </Typography>
-          <WeatherIcon src={`https://cdn.weatherbit.io/static/img/icons/${weatherData.weather?.icon}.png`} alt="weather icon" />
+          <WeatherIcon
+            src={`https://cdn.weatherbit.io/static/img/icons/${weatherData.weather?.icon}.png`}
+            alt="weather icon"
+          />
         </TemperatureGroup>
         <Content>
-          <Typography fontSize="17px" fontWeight="500">{weatherData.weather?.description}</Typography>
+          <Typography fontSize="17px" fontWeight="500">
+            {weatherData.weather?.description}
+          </Typography>
           <Typography fontWeight="300" fontSize="15px" color="#ddd">
-            {weatherData.temp ? `Feels like ${Math.round(weatherData.temp - 5)}°` : 'No data'}
+            {weatherData.temp
+              ? `Feels like ${Math.round(weatherData.temp - 5)}°`
+              : "No data"}
           </Typography>
         </Content>
       </WeatherInfo>
       <Content>
-        <Typography fontWeight='300'>
-          {selectedDay ? new Date(selectedDay).toLocaleDateString('en-US', {
-            weekday: 'long',
-            month: 'long',
-            day: 'numeric'
-          }) : 'Current conditions'}
+        <CityContainer>
+          <Typography fontSize="20px" fontWeight="500">
+            {recentSearches.length > 0
+              ? recentSearches[0].city
+              : "No location selected"}
+          </Typography>
+        </CityContainer>
+        <Typography fontWeight="300">
+          {selectedDay
+            ? new Date(selectedDay).toLocaleDateString("en-US", {
+                weekday: "long",
+                month: "long",
+                day: "numeric",
+              })
+            : "Current conditions"}
         </Typography>
         <SquareGrid>
           {getSquareConfig(weatherData).map((config) => (
-            <Square
-              key={config.type}
-              {...config}
-            />
+            <Square key={config.type} {...config} />
           ))}
         </SquareGrid>
       </Content>
+      <Forecast />
       <Center>
-        <Typography fontWeight='300' fontSize='26px'>{time}</Typography>
+        <Typography fontWeight="300" fontSize="26px">
+          {time}
+        </Typography>
       </Center>
     </Container>
-  )
-}
+  );
+};
 
 const Container = styled.div`
   background: rgb(1, 50, 83);
@@ -200,8 +224,12 @@ const Container = styled.div`
 const Content = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 8px;
   justify-content: center;
+
+  @media (max-width: 1024px) {
+    gap: 16px;
+  }
 `;
 
 const LogoContainer = styled.div`
@@ -258,8 +286,8 @@ const WeatherIcon = styled.img`
 
 const SquareGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(2, 1fr); 
-  grid-template-rows: repeat(2, 1fr);   
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
   gap: 10px;
   width: 100%;
 
@@ -279,4 +307,12 @@ const SquareGrid = styled.div`
   }
 `;
 
-export default Sidebar
+const CityContainer = styled.div`
+  display: none;
+
+  @media (max-width: 1024px) {
+    display: block;
+  }
+`;
+
+export default Sidebar;
