@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useEffect, useState } from "react";
 import { styled } from "styled-components";
 import clearSky from "../assets/clear_sky.jpg";
 import brokenClouds from "../assets/broken_clouds.jpg";
@@ -14,8 +14,17 @@ import Typography from "../components/Typography";
 import { useApiContext } from "../utils/context/ApiContext";
 import { Forecast } from "../utils/types/forecast";
 
+// Preload images
+const imageUrls = [clearSky, brokenClouds, lightRain, snow, defaultBg, dramaticSky];
+imageUrls.forEach(url => {
+  const img = new Image();
+  img.src = url;
+});
+
 const WeatherPage: React.FC = React.memo(() => {
   const { data, selectedDay } = useApiContext();
+  const [currentImage, setCurrentImage] = useState(defaultBg);
+  const [isLoading, setIsLoading] = useState(true);
 
   const backgroundImage = useMemo(() => {
     if (!data?.current?.data?.[0]?.weather && !data?.forecast?.data) return defaultBg;
@@ -48,6 +57,20 @@ const WeatherPage: React.FC = React.memo(() => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data?.current?.data, data?.forecast?.data, selectedDay]);
 
+  useEffect(() => {
+    if (backgroundImage === currentImage) {
+      setIsLoading(false);
+      return;
+    }
+
+    const img = new Image();
+    img.src = backgroundImage;
+    img.onload = () => {
+      setCurrentImage(backgroundImage);
+      setIsLoading(false);
+    };
+  }, [backgroundImage, currentImage]);
+
   const locationInfo = useMemo(() => {
     if (!data?.current?.data?.[0]) {
       return {
@@ -79,7 +102,11 @@ const WeatherPage: React.FC = React.memo(() => {
   }, [data, selectedDay]);
 
   return (
-    <Container $backgroundImage={backgroundImage}>
+    <Container>
+      <BackgroundImage 
+        $backgroundImage={currentImage}
+        $isLoading={isLoading}
+      />
       <Overlay />
       <Sidebar />
       <Fragment>
@@ -103,45 +130,42 @@ const WeatherPage: React.FC = React.memo(() => {
 
 const Fragment = styled.div``;
 
-const Container = styled.div<{ $backgroundImage: string }>`
+const Container = styled.div`
   position: relative;
-  background-image: url(${props => props.$backgroundImage});
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
   min-height: 100vh;
   display: grid;
   grid-template-columns: 3fr 9fr;
-  padding: 35px 100px;
   gap: 32px;
+  padding: 35px 100px;
 
-  // Add an overlay using a pseudo-element
-  &::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(1, 50, 83, 0.4); // Semi-transparent black
-    z-index: 1; // Ensures the overlay is on top of the background
-  }
-
-  // Make sure content appears above the overlay
-  > * {
-    position: relative;
-    z-index: 2;
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
   }
 `;
 
+const BackgroundImage = styled.div<{ $backgroundImage: string; $isLoading: boolean }>`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url(${props => props.$backgroundImage});
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: ${props => props.$isLoading ? 0 : 1};
+  transition: opacity 0.5s ease-in-out;
+  z-index: -2;
+`;
+
 const Overlay = styled.div`
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
   background-color: rgba(1, 50, 83, 0.4);
-  z-index: 1;
+  z-index: -1;
 `;
 
 const HeadLiner = styled.div`
