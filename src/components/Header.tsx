@@ -113,7 +113,9 @@ const Header: React.FC = React.memo(() => {
           />
           {/* Click icon to either expand or submit */}
           <SearchIconWrapper 
-            type="button" 
+            type="button"
+            aria-label="search"
+            data-testid="search-button"
             onClick={handleSearchClick}
             data-action="search"
             $error={error}
@@ -122,7 +124,7 @@ const Header: React.FC = React.memo(() => {
           </SearchIconWrapper>
         </SearchContainer>
       </form>
-      <Button onClick={handleRedirect}>
+      <Button data-testid="download-button" onClick={handleRedirect}>
         <ResponsiveButtonText />
       </Button>
     </Container>

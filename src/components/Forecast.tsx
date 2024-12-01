@@ -20,7 +20,7 @@ const Forecast: React.FC = () => {
   };
 
   return (
-    <Container>
+    <Container data-testid="forecast-container">
       <Typography fontWeight="500" fontSize="20px">
         Upcoming Forecast
       </Typography>

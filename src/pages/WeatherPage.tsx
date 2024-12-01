@@ -146,6 +146,10 @@ const Container = styled.div`
       order: 1;
     }
   }
+
+  @media (max-width: 768px) {
+    padding: 10px;
+  }
 `;
 
 const BackgroundImage = styled.div<{ $backgroundImage: string; $isLoading: boolean }>`

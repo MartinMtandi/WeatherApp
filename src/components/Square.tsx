@@ -31,7 +31,7 @@ const Square: React.FC<SquareProps> = ({ title, value, unit, subtitle, type }) =
   };
 
   return (
-    <Container>
+    <Container data-testid={`${type}-square`}>
       <Header>
         <Typography fontSize='14px' fontWeight='300'>{title}</Typography>
         {type === 'wind' && <DirectionLabel>N</DirectionLabel>}
@@ -42,8 +42,8 @@ const Square: React.FC<SquareProps> = ({ title, value, unit, subtitle, type }) =
         </IconContainer>
         <ValueContainer>
           <Value>
-            <Typography fontSize='24px' fontWeight='500'>{value}</Typography>
-            {unit && <Typography fontSize='14px' fontWeight='300'>{unit}</Typography>}
+            <Typography data-testid={`${type}-value`} fontSize='24px' fontWeight='500'>{value}</Typography>
+            {unit && <Typography data-testid={`${type}-unit`} fontSize='14px' fontWeight='300'>{unit}</Typography>}
           </Value>
           {subtitle && (
             <Typography fontSize='12px' color='#6b7280' fontWeight='300'>
