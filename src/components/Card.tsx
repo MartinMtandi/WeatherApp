@@ -26,9 +26,9 @@ const Card: React.FC<{ search: RecentSearch }> = ({ search }) => {
 };
 
 const Container = styled.div`
-  border: 1px solid #6b7280;
+  border: 1px solid rgb(1, 50, 83);
   border-radius: 10px;
-  background: rgba(75, 85, 99, 0.3);
+  background: rgb(1, 50, 83);
   padding: 10px;
   width: 100%;
   min-width: 0;

@@ -118,16 +118,16 @@ const Container = styled.div`
 const Button = styled.button`
   color: #ddd;
   padding: 8px 18px;
-  border: 1px solid #6b7280;
+  border: 1px solid rgb(1, 50, 83);
   border-radius: 16px;
-  background: rgba(75, 85, 99, 0.6);
+  background: rgb(1, 50, 83);
   font-size: 14px;
   cursor: pointer;
-  transition: background 0.4s ease, border-radius 0.3s ease;
+  transition: all 0.4s ease-in-out;
 
   &:hover {
-    background: rgba(75, 85, 99, 0.3);
     border-radius: 10px;
+    border: 1px solid #6b7280;
   }
 `;
 
@@ -154,7 +154,7 @@ const SearchContainer = styled.div<{ $error?: boolean }>`
   transition: all 0.4s ease;
 
   &:hover {
-    background: rgba(75, 85, 99, 0.3);
+    background: rgba(1, 50, 83, 0.5);
     border-radius: 10px;
     border: 1px solid ${props => props.$error ? '#ef4444' : '#6b7280'};
   }
@@ -167,7 +167,7 @@ const Search = styled.input<{ $expanded: boolean; $error?: boolean }>`
   border-radius: 18px;
   padding-right: 36px; /* Space for the icon on the right */
   padding-left: ${(props) => (props.$expanded ? "16px" : "3px")};
-  background: rgba(75, 85, 99, 0.6);
+  background: rgba(1, 50, 83, 0.5);
   color: ${props => props.$error ? '#ef4444' : '#ddd'};
   font-size: 14px;
   outline: none;

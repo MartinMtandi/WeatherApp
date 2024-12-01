@@ -41,7 +41,7 @@ const Tile: React.FC<TileProps> = ({ forecast, $isActive, onClick }) => {
             >
               <stop
                 offset="0%"
-                style={{ stopColor: "transparent", stopOpacity: 0 }}
+                style={{ stopColor: "rgb(1, 50, 83)", stopOpacity: 0 }}
               />
               <stop
                 offset="30%"
@@ -53,7 +53,7 @@ const Tile: React.FC<TileProps> = ({ forecast, $isActive, onClick }) => {
               />
               <stop
                 offset="100%"
-                style={{ stopColor: "transparent", stopOpacity: 0 }}
+                style={{ stopColor: "rgb(1, 50, 83)", stopOpacity: 0 }}
               />
             </linearGradient>
           </defs>
@@ -125,9 +125,9 @@ const Container = styled.div<{ $isActive?: boolean }>`
 const TileWrapper = styled.div<{ $isActive?: boolean }>`
   min-width: 110px;
   padding: 10px 0;
-  border: 1px solid ${props => props.$isActive ? '#6b7280' : 'transparent'};
+  border: 1px solid ${props => props.$isActive ? 'rgb(1, 50, 83)' : 'transparent'};
   border-radius: ${props => props.$isActive ? '10px' : '0'};
-  background: ${props => props.$isActive ? 'rgba(75, 85, 99, 0.3)' : 'rgba(75, 85, 99, 0)'};
+  background: ${props => props.$isActive ? 'rgb(1, 50, 83)' : 'rgba(75, 85, 99, 0)'};
   transition: 
     background 0.4s ease, 
     border-color 0.4s ease, 
@@ -135,7 +135,7 @@ const TileWrapper = styled.div<{ $isActive?: boolean }>`
 
   &:hover {
     border-radius: 10px;
-    background: rgba(75, 85, 99, 0.3);
+    background: rgb(1, 50, 83);
     border: 1px solid #6b7280;
   }
 `;

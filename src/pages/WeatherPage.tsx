@@ -85,7 +85,7 @@ const Container = styled.div`
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.6); // Semi-transparent black
+    background-color: rgba(1, 50, 83, 0.3); // Semi-transparent black
     z-index: 1; // Ensures the overlay is on top of the background
   }
 

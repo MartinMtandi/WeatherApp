@@ -81,11 +81,11 @@ const WeatherCard: React.FC = React.memo(() => {
           </Typography>
           <Row>
             <Pill>
-              <Typography color="#6b7280">H</Typography>
+              <Typography color="rgb(1, 50, 83)">H</Typography>
               <Typography>{weatherInfo.high}&deg;</Typography>
             </Pill>
             <Pill>
-              <Typography color="#6b7280">L</Typography>
+              <Typography color="rgb(1, 50, 83)">L</Typography>
               <Typography>{weatherInfo.low}&deg;</Typography>
             </Pill>
           </Row>
@@ -207,7 +207,7 @@ const Pill = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border: 1px solid #6b7280;
+  border: 1px solid #ddd;
   border-radius: 16px;
   padding: 4px 15px;
   width: 100px;
