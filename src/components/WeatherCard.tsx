@@ -55,7 +55,7 @@ const WeatherCard: React.FC = React.memo(() => {
     if (!data?.forecast?.data) {
       return [];
     }
-    
+
     // Skip today's forecast and get next 6 days
     return data.forecast.data.slice(1, 7).map((item: Forecast): TileForecast => ({
       day: item.datetime,
@@ -112,12 +112,12 @@ const WeatherCard: React.FC = React.memo(() => {
         <Feature>
           <Row $gap={8}>
             <Grid>
-              <Typography color="#6b7280">Recently Searched</Typography>
+              <Typography fontWeight="500">Recently Searched</Typography>
               <Link $disabled={!recentSearches?.length} onClick={handleSeeAllClick}>
                 <Typography color={recentSearches?.length ? '#ddd' : '#6b7280'}>
                   {showAllSearches ? "Show less" : "See all"}{" "}
                   <IconWrapper $margin="5px 0 0 4px">
-                    <ChevronRightIcon size={16} style={{ 
+                    <ChevronRightIcon size={16} style={{
                       transform: showAllSearches ? 'rotate(-90deg)' : 'rotate(90deg)',
                       transition: 'transform 0.3s ease'
                     }} />
@@ -143,14 +143,14 @@ const WeatherCard: React.FC = React.memo(() => {
                   </CardGrid>
                 )
               ) : (
-                <Typography color="#6b7280">No recent searches</Typography>
+                <Typography fontWeight="500">No recent searches</Typography>
               )}
             </CarouselContainer>
           </Row>
         </Feature>
       </Grid>
       <Fragment>
-        <Typography fontWeight="400" fontSize="16px" color="#6b7280">
+        <Typography fontWeight="500" fontSize="16px">
           Upcoming Forecast
         </Typography>
         <Grid>
