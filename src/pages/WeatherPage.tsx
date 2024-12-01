@@ -139,7 +139,11 @@ const Container = styled.div`
   padding: 35px 100px;
 
   @media (max-width: 1024px) {
+    min-height: auto;
     grid-template-columns: 1fr;
+     & > :nth-child(3) {
+      order: 1;
+    }
   }
 `;
 
@@ -173,6 +177,10 @@ const HeadLiner = styled.div`
   align-items: baseline;
   flex-direction: row;
   gap: 8px;
+
+   @media (max-width: 1024px) {
+    display: none;
+  }
 `;
 
 const IconWrapper = styled.div<{ $margin?: string }>`

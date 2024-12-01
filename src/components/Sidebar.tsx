@@ -17,54 +17,112 @@ const Sidebar: React.FC = () => {
     if (!selectedDay || !typedData?.forecast?.data) {
       if (!typedData?.current?.data?.[0]) {
         return {
+          temp: 0,
           wind_spd: 0,
           wind_cdir: 'N',
           rh: 0,
           uv: 0,
           pres: 0,
           wind_description: 'Calm',
-          dew_point: 0
+          dewpt: 0,
+          weather: {
+            description: 'No data',
+            icon: 'c01d'
+          }
         };
       }
       const current = typedData.current.data[0];
       return {
+        temp: current.temp,
         wind_spd: Math.round(current.wind_spd * 3.6), // Convert m/s to km/h
         wind_cdir: current.wind_cdir,
         rh: Math.round(current.rh),
         uv: Math.round(current.uv),
         pres: Math.round(current.pres),
         wind_description: current.wind_spd < 5 ? 'Light' : 'Moderate',
-        dew_point: Math.round(current.dewpt || 0)
+        dewpt: Math.round(current.dewpt || 0),
+        weather: current.weather
       };
     }
 
     // Use selected day's forecast data
-    const forecastData = typedData.forecast.data.find((day: WeatherData) => 
+    const forecastData = typedData.forecast.data.find((day: WeatherData) =>
       day.datetime === selectedDay
     );
 
     if (!forecastData) {
       return {
+        temp: 0,
         wind_spd: 0,
         wind_cdir: 'N',
         rh: 0,
         uv: 0,
         pres: 0,
         wind_description: 'Calm',
-        dew_point: 0
+        dewpt: 0,
+        weather: {
+          description: 'No data',
+          icon: 'c01d'
+        }
       };
     }
 
     return {
-      wind_spd: Math.round(forecastData.wind_spd * 3.6), // Convert m/s to km/h
+      temp: forecastData.temp,
+      wind_spd: Math.round(forecastData.wind_spd * 3.6),
       wind_cdir: forecastData.wind_cdir,
       rh: Math.round(forecastData.rh),
       uv: Math.round(forecastData.uv),
       pres: Math.round(forecastData.pres),
       wind_description: forecastData.wind_spd < 5 ? 'Light' : 'Moderate',
-      dew_point: Math.round(forecastData.dewpt || 0)
+      dewpt: Math.round(forecastData.dewpt || 0),
+      weather: forecastData.weather
     };
   }, [typedData, selectedDay]);
+
+  interface WeatherDataExtended extends WeatherData {
+    wind_description?: string;
+    dewpt?: number;
+  }
+
+  type SquareType = 'wind' | 'humidity' | 'uv' | 'pressure';
+
+  interface SquareConfig {
+    type: SquareType;
+    title: string;
+    value: number;
+    unit?: string;
+    subtitle?: string;
+  }
+
+  const getSquareConfig = (weatherData: WeatherDataExtended): SquareConfig[] => [
+    {
+      type: "wind" as SquareType,
+      title: "Wind",
+      value: weatherData.wind_spd,
+      unit: "km/h",
+      subtitle: `${weatherData.wind_description || 'N/A'} • From ${weatherData.wind_cdir.toLowerCase()}`
+    },
+    {
+      type: "humidity" as SquareType,
+      title: "Humidity",
+      value: weatherData.rh,
+      unit: "%",
+      subtitle: `Dew point ${weatherData.dewpt || 0}°`
+    },
+    {
+      type: "uv" as SquareType,
+      title: "UV index",
+      value: weatherData.uv,
+      subtitle: weatherData.uv <= 2 ? 'Low' : weatherData.uv <= 5 ? 'Moderate' : 'High'
+    },
+    {
+      type: "pressure" as SquareType,
+      title: "Pressure",
+      value: weatherData.pres,
+      unit: "mBar"
+    }
+  ];
 
   useEffect(() => {
     const updateTime = () => {
@@ -91,41 +149,35 @@ const Sidebar: React.FC = () => {
           <Typography fontSize='20px'>WeatherApp</Typography>
         </LogoContainer>
       </Center>
+      <WeatherInfo>
+        <TemperatureGroup>
+          <Typography fontWeight="300" fontSize="64px">
+            {Math.round(weatherData.temp || 0)}°
+          </Typography>
+          <WeatherIcon src={`https://cdn.weatherbit.io/static/img/icons/${weatherData.weather?.icon}.png`} alt="weather icon" />
+        </TemperatureGroup>
+        <Content>
+          <Typography fontSize="17px" fontWeight="500">{weatherData.weather?.description}</Typography>
+          <Typography fontWeight="300" fontSize="15px" color="#ddd">
+            {weatherData.temp ? `Feels like ${Math.round(weatherData.temp - 5)}°` : 'No data'}
+          </Typography>
+        </Content>
+      </WeatherInfo>
       <Content>
         <Typography fontWeight='300'>
-          {selectedDay ? new Date(selectedDay).toLocaleDateString('en-US', { 
-            weekday: 'long', 
-            month: 'long', 
-            day: 'numeric' 
+          {selectedDay ? new Date(selectedDay).toLocaleDateString('en-US', {
+            weekday: 'long',
+            month: 'long',
+            day: 'numeric'
           }) : 'Current conditions'}
         </Typography>
         <SquareGrid>
-          <Square 
-            type="wind"
-            title="Wind" 
-            value={weatherData.wind_spd} 
-            unit="km/h" 
-            subtitle={`${weatherData.wind_description} • From ${weatherData.wind_cdir.toLowerCase()}`}
-          />
-          <Square 
-            type="humidity"
-            title="Humidity" 
-            value={weatherData.rh} 
-            unit="%" 
-            subtitle={`Dew point ${weatherData.dew_point}°`}
-          />
-          <Square 
-            type="uv"
-            title="UV index" 
-            value={weatherData.uv} 
-            subtitle={weatherData.uv <= 2 ? 'Low' : weatherData.uv <= 5 ? 'Moderate' : 'High'}
-          />
-          <Square 
-            type="pressure"
-            title="Pressure" 
-            value={weatherData.pres} 
-            unit="mBar"
-          />
+          {getSquareConfig(weatherData).map((config) => (
+            <Square
+              key={config.type}
+              {...config}
+            />
+          ))}
         </SquareGrid>
       </Content>
       <Center>
@@ -148,7 +200,8 @@ const Container = styled.div`
 const Content = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 4px;
+  justify-content: center;
 `;
 
 const LogoContainer = styled.div`
@@ -173,11 +226,57 @@ const Logo = styled.img`
   }
 `;
 
+const WeatherInfo = styled.div`
+  display: none;
+
+  @media (max-width: 1024px) {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+    margin: 16px 0;
+  }
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+    gap: 16px;
+  }
+`;
+
+const TemperatureGroup = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+`;
+
+const WeatherIcon = styled.img`
+  width: 80px;
+  height: 80px;
+`;
+
 const SquareGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(2, 1fr); 
   grid-template-rows: repeat(2, 1fr);   
   gap: 10px;
+  width: 100%;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  @media (max-width: 768px) {
+    gap: 12px;
+  }
+
+  @media (max-width: 480px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
 `;
 
 export default Sidebar

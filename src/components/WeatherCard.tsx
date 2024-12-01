@@ -201,6 +201,10 @@ const Row = styled.div<{ $gap?: number }>`
   gap: ${(props) => props.$gap || 4}px;
   justify-content: space-around;
   height: 90%;
+
+   @media (max-width: 1024px) {
+    display: none;
+  }
 `;
 
 const Pill = styled.div`
