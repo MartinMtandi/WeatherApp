@@ -15,49 +15,52 @@ const WeatherCard: React.FC = React.memo(() => {
   const weatherInfo = useMemo(() => {
     if (!data?.current?.data?.[0] || !data?.forecast?.data?.[0]) {
       return {
-        temp: "N/A",
-        high: "N/A",
-        low: "N/A",
-        description: "Loading...",
-        icon: ""
+        temp: 0,
+        high: 0,
+        low: 0,
+        description: '',
+        icon: '',
       };
     }
 
-    // If there's an active day selected, use that forecast data instead
-    const currentData = data.current.data[0];
-    const forecastData = data.forecast.data;
-    
     if (selectedDay) {
-      const activeForecast = forecastData.find(
-        (f: Forecast) => new Date(f.datetime).toLocaleDateString('en-US', { weekday: 'long' }) === selectedDay
+      const selectedForecast = data.forecast.data.find(
+        (item: Forecast) => item.datetime === selectedDay
       );
-      
-      if (activeForecast) {
+
+      if (selectedForecast) {
         return {
-          temp: Math.round(activeForecast.temp),
-          high: Math.round(activeForecast.high_temp),
-          low: Math.round(activeForecast.low_temp),
-          description: activeForecast.weather.description,
-          icon: activeForecast.weather.icon
+          temp: Math.round(selectedForecast.temp),
+          high: Math.round(selectedForecast.high_temp),
+          low: Math.round(selectedForecast.low_temp),
+          description: selectedForecast.weather.description,
+          icon: selectedForecast.weather.icon,
         };
       }
     }
 
-    // Default to current weather if no active day or if active day not found
+    const current = data.current.data[0];
+    const forecast = data.forecast.data[0];
+
     return {
-      temp: Math.round(currentData.temp),
-      high: Math.round(forecastData[0].high_temp),
-      low: Math.round(forecastData[0].low_temp),
-      description: currentData.weather.description,
-      icon: currentData.weather.icon
+      temp: Math.round(current.temp),
+      high: Math.round(forecast.high_temp),
+      low: Math.round(forecast.low_temp),
+      description: current.weather.description,
+      icon: current.weather.icon,
     };
   }, [data, selectedDay]);
 
   const forecastData = useMemo(() => {
-    if (!data?.forecast?.data) return [];
-    return data.forecast.data.slice(1, 7).map((forecast: Forecast): TileForecast => ({
-      day: new Date(forecast.datetime).toLocaleDateString('en-US', { weekday: 'long' }),
-      temp: Math.round(forecast.temp)
+    if (!data?.forecast?.data) {
+      return [];
+    }
+    
+    // Skip today's forecast and get next 6 days
+    return data.forecast.data.slice(1, 7).map((item: Forecast): TileForecast => ({
+      day: item.datetime,
+      temp: Math.round(item.temp),
+      description: item.weather.description,
     }));
   }, [data]);
 
@@ -155,7 +158,7 @@ const WeatherCard: React.FC = React.memo(() => {
             <Tile
               key={forecast.day}
               forecast={forecast}
-              isActive={selectedDay === forecast.day}
+              $isActive={selectedDay === forecast.day}
               onClick={() => handleTileClick(forecast.day)}
             />
           ))}

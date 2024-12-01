@@ -6,7 +6,6 @@ export interface Forecast {
   weather: {
     description: string;
     icon: string;
-    code: number;
   };
 }
 
@@ -19,4 +18,5 @@ export interface WeatherResponse {
 export interface TileForecast {
   day: string;
   temp: number;
+  description: string;
 }

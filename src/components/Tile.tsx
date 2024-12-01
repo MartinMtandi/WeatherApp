@@ -2,28 +2,25 @@ import React from "react";
 import styled from "styled-components";
 import Typography from "./Typography";
 import { TileForecast } from "../utils/types/forecast";
+import { getDay } from "../utils/helpers/date";
 
 interface TileProps {
   forecast: TileForecast;
-  isActive?: boolean;
+  $isActive?: boolean;
   onClick?: () => void;
 }
 
-const Tile: React.FC<TileProps> = ({ forecast, isActive, onClick }) => {
+const Tile: React.FC<TileProps> = ({ forecast, $isActive, onClick }) => {
   return (
-    <TileWrapper isActive={isActive} onClick={onClick}>
-      <Container isActive={isActive}>
-        <StyledTypography>
-          <Typography fontWeight="300" fontSize="18px" color="#d1d5db">
-            {forecast.day}
-          </Typography>
-        </StyledTypography>
-        <Divider isActive={isActive} />
-        <StyledTypography>
-          <Typography fontWeight="300" fontSize="24px" color="#6b7280">
-            {forecast.temp}&deg;
-          </Typography>
-        </StyledTypography>
+    <TileWrapper $isActive={$isActive} onClick={onClick}>
+      <Container $isActive={$isActive}>
+        <Typography fontWeight="300" fontSize="16px">
+          {getDay(forecast.day)}
+        </Typography>
+        <Divider $isActive={$isActive} />
+        <Typography fontWeight="300" fontSize="16px">
+          {forecast.temp}&deg;
+        </Typography>
       </Container>
       <CurvyLineWrapper>
         <svg
@@ -80,9 +77,9 @@ const Tile: React.FC<TileProps> = ({ forecast, isActive, onClick }) => {
   );
 };
 
-const Divider = styled.div<{ isActive?: boolean }>`
+const Divider = styled.div<{ $isActive?: boolean }>`
   height: 126px;
-  border-left: 1px dashed ${props => props.isActive ? '#ddd' : '#6b7280'};
+  border-left: 1px dashed ${props => props.$isActive ? '#ddd' : '#6b7280'};
   margin: 6px 0px;
   transition: border-left-color 0.3s ease;
 `;
@@ -98,13 +95,13 @@ const CurvyLineWrapper = styled.div`
   z-index: -1;
 `;
 
-const Container = styled.div<{ isActive?: boolean }>`
+const Container = styled.div<{ $isActive?: boolean }>`
   display: flex;
   flex-direction: column;
   align-items: center;
   cursor: pointer;
   
-  ${props => props.isActive && `
+  ${props => props.$isActive && `
     ${Divider} {
       border-left-color: #ddd;
     }
@@ -125,21 +122,12 @@ const Container = styled.div<{ isActive?: boolean }>`
   }
 `;
 
-const StyledTypography = styled.div`
-  transition: color 0.3s ease;
-  color: inherit;
-
-  ${Container}:hover & {
-    color: #fff;
-  }
-`;
-
-const TileWrapper = styled.div<{ isActive?: boolean }>`
+const TileWrapper = styled.div<{ $isActive?: boolean }>`
   min-width: 110px;
   padding: 10px 0;
-  border: 1px solid ${props => props.isActive ? '#6b7280' : 'transparent'};
-  border-radius: ${props => props.isActive ? '10px' : '0'};
-  background: ${props => props.isActive ? 'rgba(75, 85, 99, 0.3)' : 'rgba(75, 85, 99, 0)'};
+  border: 1px solid ${props => props.$isActive ? '#6b7280' : 'transparent'};
+  border-radius: ${props => props.$isActive ? '10px' : '0'};
+  background: ${props => props.$isActive ? 'rgba(75, 85, 99, 0.3)' : 'rgba(75, 85, 99, 0)'};
   transition: 
     background 0.4s ease, 
     border-color 0.4s ease, 

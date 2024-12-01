@@ -24,7 +24,7 @@ const Carousel: React.FC<CarouselProps> = ({ children, itemsPerPage = 2 }) => {
 
   return (
     <Container>
-      <ButtonWrapper position="left">
+      <ButtonWrapper $position="left">
         <Button onClick={handlePrev} disabled={totalPages <= 1}>
           <ChevronLeft size={20} />
         </Button>
@@ -32,7 +32,7 @@ const Carousel: React.FC<CarouselProps> = ({ children, itemsPerPage = 2 }) => {
       <Content>
         {visibleItems}
       </Content>
-      <ButtonWrapper position="right">
+      <ButtonWrapper $position="right">
         <Button onClick={handleNext} disabled={totalPages <= 1}>
           <ChevronRight size={20} />
         </Button>
@@ -59,11 +59,11 @@ const Content = styled.div`
   }
 `;
 
-const ButtonWrapper = styled.div<{ position: 'left' | 'right' }>`
+const ButtonWrapper = styled.div<{ $position: 'left' | 'right' }>`
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  ${props => props.position === 'left' ? 'left: -40px;' : 'right: -40px;'}
+  ${props => props.$position === 'left' ? 'left: -40px;' : 'right: -40px;'}
   z-index: 1;
 `;
 

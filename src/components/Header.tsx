@@ -3,10 +3,12 @@ import styled from "styled-components";
 import { Search as SearchIcon } from "react-feather";
 import Typography from "./Typography";
 import { useApiContext } from "../utils/context/ApiContext";
+import { capitalizeWords } from "../utils/helpers/string";
 
 const Header: React.FC = React.memo(() => {
   const [expanded, setExpanded] = useState<boolean>(false);
   const [city, setSearchCity] = useState<string>("");
+  const [error, setError] = useState<boolean>(false);
 
   const { fetchData } = useApiContext();
 
@@ -21,10 +23,10 @@ const Header: React.FC = React.memo(() => {
 
   const handleSearchClick = useCallback(async () => {
     if (!expanded) {
-      setExpanded(true); // Expand the input if not already expanded
+      setExpanded(true); 
     } else if (city.trim()) {
-      await handleSearchSubmit(); // Submit the form only if the city is populated
-      setExpanded(false); // Collapse after successful search
+      await handleSearchSubmit(); 
+      setExpanded(false); 
     }
   }, [expanded, city]);
 
@@ -35,7 +37,6 @@ const Header: React.FC = React.memo(() => {
       return;
     }
     
-    // Only collapse if the input is empty
     if (!city.trim()) {
       setExpanded(false);
       setSearchCity("");
@@ -44,17 +45,20 @@ const Header: React.FC = React.memo(() => {
 
   const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchCity(e.target.value);
-  }, []);
+    if (error) setError(false); 
+  }, [error]);
 
   const handleSearchSubmit = useCallback(async () => {
     if (city.trim()) {
+      const formattedCity = capitalizeWords(city.trim());
       try {
-        // fetchData will handle the caching logic
-        await fetchData(city);
-        setSearchCity(""); // Reset the input after successful submission
-        setExpanded(false); // Collapse the search after successful submission
+        await fetchData(formattedCity);
+        setSearchCity(""); 
+        setExpanded(false); 
+        setError(false); 
       } catch (error) {
         console.error('Error fetching weather data:', error);
+        setError(true); 
       }
     }
   }, [city, fetchData]);
@@ -69,10 +73,11 @@ const Header: React.FC = React.memo(() => {
   return (
     <Container>
       <form onSubmit={(e) => e.preventDefault()}>
-        <SearchContainer>
+        <SearchContainer $error={error}>
           <Search
             type="text"
             $expanded={expanded}
+            $error={error}
             value={city}
             placeholder={expanded ? "Search by city" : ""}
             onFocus={() => setExpanded(true)}
@@ -90,6 +95,7 @@ const Header: React.FC = React.memo(() => {
             type="button" 
             onClick={handleSearchClick}
             data-action="search"
+            $error={error}
           >
             <SearchIcon size={16} />
           </SearchIconWrapper>
@@ -125,10 +131,10 @@ const Button = styled.button`
   }
 `;
 
-const SearchIconWrapper = styled.button`
+const SearchIconWrapper = styled.button<{ $error?: boolean }>`
   position: absolute;
   right: 12px;
-  color: #9ca3af;
+  color: ${props => props.$error ? '#ef4444' : '#9ca3af'};
   background: transparent;
   border: none;
   cursor: pointer;
@@ -139,22 +145,22 @@ const SearchIconWrapper = styled.button`
   }
 `;
 
-const SearchContainer = styled.div`
+const SearchContainer = styled.div<{ $error?: boolean }>`
   position: relative;
   display: flex;
   align-items: center;
-  border: 1px solid transparent;
+  border: 1px solid ${props => props.$error ? '#ef4444' : 'transparent'};
   border-radius: 18px;
-  transition: background 0.4s ease, border-radius 0.3s ease;
+  transition: all 0.4s ease;
 
   &:hover {
     background: rgba(75, 85, 99, 0.3);
     border-radius: 10px;
-    border: 1px solid #6b7280;
+    border: 1px solid ${props => props.$error ? '#ef4444' : '#6b7280'};
   }
 `;
 
-const Search = styled.input<{ $expanded: boolean }>`
+const Search = styled.input<{ $expanded: boolean; $error?: boolean }>`
   width: ${(props) => (props.$expanded ? "250px" : "36px")};
   height: 36px;
   border: none;
@@ -162,7 +168,7 @@ const Search = styled.input<{ $expanded: boolean }>`
   padding-right: 36px; /* Space for the icon on the right */
   padding-left: ${(props) => (props.$expanded ? "16px" : "3px")};
   background: rgba(75, 85, 99, 0.6);
-  color: #ddd;
+  color: ${props => props.$error ? '#ef4444' : '#ddd'};
   font-size: 14px;
   outline: none;
   transition: all 0.4s ease-in-out;
@@ -174,7 +180,7 @@ const Search = styled.input<{ $expanded: boolean }>`
   }
 
   &::placeholder {
-    color: #9ca3af;
+    color: ${props => props.$error ? '#ef4444' : '#9ca3af'};
   }
 
   &:focus {
