@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { createContext, useState, useContext, useCallback, ReactNode, useEffect } from "react";
 import { ApiContextType, RecentSearch } from "../types/api_context";
 import { ApiService } from "../../services/ApiService";
