@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { styled } from "styled-components";
-import palmTrees from "../assets/grass.avif";
+import palmTrees from "../assets/dramatic-sky.jpg";
 import Sidebar from "../components/Sidebar";
 import WeatherCard from "../components/WeatherCard";
 import Header from "../components/Header";
@@ -9,7 +9,7 @@ import Typography from "../components/Typography";
 import { useApiContext } from "../utils/context/ApiContext";
 
 const WeatherPage: React.FC = React.memo(() => {
-  const { data } = useApiContext();
+  const { data, selectedDay } = useApiContext();
 
   const locationInfo = useMemo(() => {
     if (!data?.current?.data?.[0]) {
@@ -20,7 +20,14 @@ const WeatherPage: React.FC = React.memo(() => {
     }
 
     const currentData = data.current.data[0];
-    const date = new Date();
+    let date;
+    
+    if (selectedDay) {
+      date = new Date(selectedDay);
+    } else {
+      date = new Date();
+    }
+
     const formattedDate = date.toLocaleDateString('en-US', { 
       weekday: 'long', 
       year: 'numeric', 
@@ -32,7 +39,7 @@ const WeatherPage: React.FC = React.memo(() => {
       location: `${currentData.city_name}, ${currentData.country_code}`,
       date: `(${formattedDate})`
     };
-  }, [data]);
+  }, [data, selectedDay]);
 
   return (
     <Container>
@@ -68,6 +75,7 @@ const Container = styled.div`
   display: grid;
   grid-template-columns: 3fr 9fr;
   padding: 35px 100px;
+  gap: 32px;
 
   // Add an overlay using a pseudo-element
   &::before {

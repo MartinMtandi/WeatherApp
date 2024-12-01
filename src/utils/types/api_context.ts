@@ -6,6 +6,30 @@ export interface RecentSearch {
   icon: string;
 }
 
+export interface WeatherData {
+  datetime?: string;
+  temp?: number;
+  wind_spd: number;
+  wind_cdir: string;
+  rh: number;
+  uv: number;
+  pres: number;
+  dewpt?: number;
+  weather?: {
+    description: string;
+    icon: string;
+  };
+}
+
+export interface WeatherResponse {
+  data: WeatherData[];
+}
+
+export interface ApiResponse {
+  current?: WeatherResponse;
+  forecast?: WeatherResponse;
+}
+
 export interface ApiContextType {
   data: Record<string, any>;
   selectedDay: string | null;
