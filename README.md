@@ -30,7 +30,7 @@ Before you begin, ensure you have the following installed:
 
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
+   git clone git@github.com:MartinMtandi/WeatherApp.git
    cd weather-app
    ```
 
@@ -94,7 +94,7 @@ Before you begin, ensure you have the following installed:
 ### Future Improvements
 1. Add weather history functionality
 2. Implement geolocation for automatic local weather
-3. Add End to End testing using Playwrght & CucumberJS
+3. Add End to End testing using Playwright & CucumberJS
 4. Implement PWA capabilities for offline access
 5. Add weather alerts and notifications
 6. Make use of Google Maps API for City name suggestions and validation
