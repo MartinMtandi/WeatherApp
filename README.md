@@ -63,6 +63,7 @@ Before you begin, ensure you have the following installed:
 - Used Context API for global state management instead of Redux, as the app's complexity doesn't warrant a full state management library
 - Implemented a custom API context to handle weather data fetching and caching
 - Separated components into presentational and container components for better maintainability
+- I opted to use Weatherbit over WeatherStack for the API, as WeatherStack's free tier is limited to current weather data. The free tier does not support forecast and historical data.
 
 ### Styling
 - Chose styled-components for component-level styling to maintain a clear connection between components and their styles
