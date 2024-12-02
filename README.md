@@ -1,50 +1,112 @@
-# React + TypeScript + Vite
+# Weather App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, responsive weather application built with React and TypeScript that allows users to search for and view weather information for different cities.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- 🔍 City weather search
+- 🌡️ Current & Forecast temperature display
+- 🎨 Clean, modern UI with styled-components
+- 📱 Responsive design
+- ✅ Comprehensive test coverage
 
-## Expanding the ESLint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- React 18
+- TypeScript
+- Vite
+- Styled Components
+- Vitest for unit testing
+- React Testing Library
+- ESLint for code quality
 
-- Configure the top-level `parserOptions` property like this:
+## Prerequisites
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+Before you begin, ensure you have the following installed:
+- Node.js (v18 or higher)
+- npm (v9 or higher)
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+## Getting Started
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+1. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   cd weather-app
+   ```
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Start the development server:
+   ```bash
+   npm run dev
+   ```
+
+4. Open your browser and visit `http://localhost:5173/`
+
+## Available Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build
+- `npm run lint` - Run ESLint
+- `npm test` - Run tests
+- `npm run test:ui` - Run tests with UI
+- `npm run test:coverage` - Generate test coverage report (The index file is available at coverage/index.html)
+- `npm run test:watch` - Run tests in watch mode
+
+## Design Decisions and Trade-offs
+
+### Architecture
+- Used Context API for global state management instead of Redux, as the app's complexity doesn't warrant a full state management library
+- Implemented a custom API context to handle weather data fetching and caching
+- Separated components into presentational and container components for better maintainability
+
+### Styling
+- Chose styled-components for component-level styling to maintain a clear connection between components and their styles
+- Used a modular design system with consistent spacing and typography
+- Used inbuilt CSS animations for smooth transitions instead of external libraries like react-spring or framer-motion which were overkill.
+
+### Testing
+- Implemented comprehensive unit tests using Vitest and React Testing Library
+- Focused on testing user interactions and component integration rather than implementation details
+- Used mock service worker (MSW) for API testing to avoid actual network calls during tests
+
+### Performance
+- Implemented debouncing for search input to reduce unnecessary API calls
+- Used React.memo() selectively for components that receive stable props
+- Optimized bundle size by using specific imports from large packages
+- Implemented caching strategies:
+  - Cached API responses for 30 minutes to reduce redundant network calls
+  - Stored recently searched cities in session storage for quick access
+- Image optimizations:
+  - Preloading strategy: Preloaded all weather background images at component initialization to ensure they're available in the browser cache
+  - Smooth transitions: Implemented a loading state with opacity transitions (0.5s ease-in-out) to prevent jarring image changes
+  - Progressive loading: Used a two-step loading process where:
+    1. A default background is shown immediately
+    2. Weather-specific backgrounds are loaded and smoothly transitioned in
+  - Memory optimization: Used useMemo for background selection logic to prevent unnecessary recalculations
+  - Fallback handling: Implemented a default background for cases where weather data or image loading fails
+  - Responsive design: Optimized background-size and position for different screen sizes using CSS properties
+
+### Future Improvements
+1. Add weather history functionality
+2. Implement geolocation for automatic local weather
+3. Add End to End testing using Playwrght & CucumberJS
+4. Implement PWA capabilities for offline access
+5. Add weather alerts and notifications
+6. Make use of Google Maps API for City name suggestions and validation
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details
